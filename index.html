@@ -18,18 +18,12 @@
 <div class="main-content">
     <button id="btn-add-book">+ Add Book</button>
 
-    <table>
-        <tr>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Pages</th>
-            <th>Read Status</th>
-            <th></th>
-        </tr>
-    </table>
+    <div class="books">
+        
+    </div>
 
     <dialog class="modal" id="modal-add-book">
-        <form action="" method="dialog" id="form-add-book">
+        <form onsubmit="createBook()" method="dialog" id="form-add-book">
             <h3>Add New Book</h3>
             <input type="text" name="title" id="title" placeholder="Title" required>
             <input type="text" name="author" id="author" placeholder="Author" required>
