@@ -44,6 +44,10 @@ th, td {
     text-align: left;
 }
 
+td {
+    font-weight: 500;
+}
+
 table, th, td {
     border-top: 1px solid grey;
     border-bottom: 1px solid grey;
