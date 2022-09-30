@@ -2,8 +2,15 @@ const modal = document.querySelector('#modal-add-book');
 const addBook = document.querySelector('#btn-add-book');
 const form = document.getElementById("form-add-book");
 const table = document.querySelector('table');
-const books = [];
+let books = [];
 let autoIncId = 1;
+
+if ('books' in localStorage && 'autoIncId' in localStorage) {
+    books = JSON.parse(localStorage.getItem('books'));
+    autoIncId = localStorage.getItem('autoIncId')
+
+    books.forEach(book => createRow(book));
+}
 
 addBook.onclick = function(e) {
     form.reset();
@@ -27,6 +34,7 @@ function createBook() {
 
     books.push(book);
     createRow(book);
+    updateLocalStorage();
 }
 
 function createRow(book) {
@@ -57,11 +65,18 @@ function removeBook(id) {
 
     const indexOfBook = books.findIndex(book => book.id === id);
     books.pop(indexOfBook);
+
+    updateLocalStorage();
+}
+
+function updateLocalStorage() {
+    localStorage.setItem('books', JSON.stringify(books));
+    localStorage.setItem('autoIncId', autoIncId);
 }
 
 function toggleStatus(id, e) {
     const book = books.find(book => book.id === id);
-    book.toggleStatus();
+    book.read = !book.read;
 
     const button = e.target;
 
@@ -74,6 +89,8 @@ function toggleStatus(id, e) {
         button.classList.remove('green');
         button.classList.add('red');
     }
+
+    updateLocalStorage();
 }
 
 class Book {
@@ -83,9 +100,5 @@ class Book {
         this.author = author;
         this.pages = pages;
         this.read = read;
-    }
-
-    toggleStatus() {
-        this.read = !this.read;
     }
 }
