@@ -49,3 +49,33 @@ table, th, td {
     border-bottom: 1px solid grey;
     border-collapse: collapse;
 }
+
+dialog {
+    background-color: var(--background-color);
+    border: 1px solid grey;
+    padding: 16px;
+    border-radius: 15px;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+dialog form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+form input {
+    border: none;
+    border-radius: 15px;
+    padding: 15px;
+    font-size: 1.1rem;
+}
+
+form button {
+    font-size: 1.1rem;
+    padding: 10px;
+    width: 100px;
+    margin-top: 10px;
+}
