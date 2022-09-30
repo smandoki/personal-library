@@ -34,6 +34,22 @@ header {
     font-size: 1.4rem;
 }
 
+table {
+    margin-top: 60px;
+    width: 800px;
+}
+
+th, td {
+    padding: 16px 10px;
+    text-align: left;
+}
+
+table, th, td {
+    border-top: 1px solid grey;
+    border-bottom: 1px solid grey;
+    border-collapse: collapse;
+}
+
 dialog {
     background-color: #f0eef1;
     border: 1px solid grey;
@@ -71,10 +87,14 @@ form button {
     margin-top: 10px;
 }
 
+table button {
+    padding: 4px;
+}
+
 .red {
     color: darkred;
 }
 
 .green {
-    color: green
+    color: green;
 }
