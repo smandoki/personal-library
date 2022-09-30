@@ -29,16 +29,16 @@
     </table>
 
     <dialog class="modal" id="modal-add-book">
-        <form action="">
+        <form action="" method="dialog" id="form-add-book">
             <h3>Add New Book</h3>
-            <input type="text" name="title" id="title" placeholder="Title">
-            <input type="text" name="author" id="author" placeholder="Author">
-            <input type="number" name="pages" id="pages" placeholder="Pages">
+            <input type="text" name="title" id="title" placeholder="Title" required>
+            <input type="text" name="author" id="author" placeholder="Author" required>
+            <input type="number" name="pages" id="pages" placeholder="Pages" required min="1">
             <label for="read">
                 Have you read it?
                 <input type="checkbox" name="read" id="read">
             </label>
-            <button type="submit">Submit</button>
+            <button type="submit" id="submit-book">Submit</button>
         </form>
     </dialog>
 </div>

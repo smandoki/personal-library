@@ -51,15 +51,18 @@ table, th, td {
 }
 
 dialog {
-    background-color: var(--background-color);
+    background-color: #f0eef1;
     border: 1px solid grey;
-    padding: 16px;
     border-radius: 15px;
     font-size: 1.1rem;
     text-align: center;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
 }
 
 dialog form {
+    padding: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -71,6 +74,10 @@ form input {
     border-radius: 15px;
     padding: 15px;
     font-size: 1.1rem;
+}
+
+form input[type='checkbox'] {
+    margin-left: 10px;
 }
 
 form button {
