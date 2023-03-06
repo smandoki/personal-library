@@ -1,4 +1,14 @@
 * {
   font-family: Arial, Helvetica, sans-serif;
   margin: 0;
+  color: #e9e9e9;
+}
+
+body {
+  height: 100%;
+  background-color: #121212;
+}
+
+.root {
+  height: 100%;
 }
