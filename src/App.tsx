@@ -1,18 +1,27 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth, provider } from '../firebase-config';
+import { signInWithPopup, signOut } from 'firebase/auth';
+
 import Login from './components/Login';
 import BookList from './components/BookList';
 
 function App() {
+  const [user] = useAuthState(auth);
+
   return (
     <>
       <Header>
         <h1>Personal Library</h1>
-        <LogoutBtn>Logout</LogoutBtn>
+        {user && <LogoutBtn onClick={() => signOut(auth)}>Logout</LogoutBtn>}
       </Header>
 
-      <Login />
-      <BookList />
+      {!user ? (
+        <Login handleLogin={() => signInWithPopup(auth, provider)} />
+      ) : (
+        <BookList />
+      )}
     </>
   );
 }

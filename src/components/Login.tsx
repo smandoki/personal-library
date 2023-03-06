@@ -2,11 +2,11 @@ import React from 'react';
 import styled from 'styled-components';
 import GoogleIcon from '@mui/icons-material/Google';
 
-function Login() {
+function Login({ handleLogin }: { handleLogin: any }) {
   return (
     <Container>
       <h1>Log in</h1>
-      <LoginBtn>
+      <LoginBtn onClick={handleLogin}>
         <GoogleIcon />
         Log in with Google
       </LoginBtn>
