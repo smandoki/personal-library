@@ -1,11 +1,11 @@
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { User } from 'firebase/auth';
 import { db } from '../../firebase-config';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, getDocs } from 'firebase/firestore';
 
-interface IFormInput {
+interface Book {
   title: string;
   author: string;
   pages: string;
@@ -14,7 +14,8 @@ interface IFormInput {
 
 function BookList({ user }: { user: User }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const { register, handleSubmit, reset } = useForm<IFormInput>();
+  const { register, handleSubmit, reset } = useForm<Book>();
+  const [books, setBooks] = useState<Book[]>([]);
 
   const onSubmit = handleSubmit((data) => {
     closeDialog();
@@ -26,21 +27,32 @@ function BookList({ user }: { user: User }) {
     reset();
   };
 
-  const addBookToCollection = async (data: IFormInput) => {
+  const addBookToCollection = async (data: Book) => {
     try {
-      const docRef = await addDoc(collection(db, 'books'), {
-        uid: user.uid,
-        title: data.title,
-        author: data.author,
-        pages: data.pages,
-        read: data.read,
-      });
-
-      console.log('Document written with ID: ', docRef.id);
+      await addDoc(collection(db, `users/${user.uid}/books`), { ...data });
+      setBooks((prevBooks) => [...prevBooks, { ...data }]);
     } catch (e) {
       console.error('Error adding document: ', e);
     }
   };
+
+  //load users books
+  useEffect(() => {
+    const getBooksFromCollection = async () => {
+      const querySnapshot = await getDocs(
+        collection(db, `users/${user.uid}/books`)
+      );
+
+      const books: Book[] = [];
+      querySnapshot.forEach((doc) => {
+        books.push(doc.data() as Book);
+      });
+
+      setBooks(books);
+    };
+
+    getBooksFromCollection();
+  }, [user]);
 
   return (
     <Container>
@@ -80,6 +92,26 @@ function BookList({ user }: { user: User }) {
           </ButtonContainer>
         </form>
       </AddBookDialog>
+
+      <Table>
+        <tbody>
+          <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Pages</th>
+            <th>Read</th>
+          </tr>
+
+          {books.map((book, index) => (
+            <tr key={index}>
+              <td>{book.title}</td>
+              <td>{book.author}</td>
+              <td>{book.pages}</td>
+              <td>{book.read ? 'read' : 'not read'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
     </Container>
   );
 }
@@ -192,5 +224,23 @@ const ButtonContainer = styled.div`
   #submit-button {
     background-color: #a67ad9;
     color: black;
+  }
+`;
+
+const Table = styled.table`
+  //background-color: #1e1e1e;
+  margin-top: 40px;
+  border-collapse: collapse;
+
+  tbody {
+    tr:not(:first-child) {
+      border-top: 1px solid darkgray;
+      border-bottom: 1px solid darkgray;
+    }
+  }
+
+  td,
+  th {
+    padding: 16px 32px;
   }
 `;
