@@ -3,7 +3,14 @@ import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { User } from 'firebase/auth';
 import { db } from '../../firebase-config';
-import { addDoc, collection, getDocs } from 'firebase/firestore';
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  getDocs,
+  doc,
+} from 'firebase/firestore';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 interface IFormInput {
   title: string;
@@ -61,6 +68,11 @@ function BookList({ user }: { user: User }) {
     getBooksFromCollection();
   }, [user]);
 
+  const deleteBookFromCollection = async (id: string) => {
+    await deleteDoc(doc(db, `users/${user.uid}/books`, id));
+    setBooks((prevBooks) => prevBooks.filter((book) => book.id != id));
+  };
+
   return (
     <Container>
       <AddBookBtn onClick={() => dialogRef.current?.showModal()}>
@@ -108,6 +120,7 @@ function BookList({ user }: { user: User }) {
               <th>Author</th>
               <th>Pages</th>
               <th>Read</th>
+              <th></th>
             </tr>
 
             {books.map((book) => (
@@ -116,6 +129,11 @@ function BookList({ user }: { user: User }) {
                 <td>{book.author}</td>
                 <td>{book.pages}</td>
                 <td>{book.read ? 'read' : 'not read'}</td>
+                <td>
+                  <DeleteButton
+                    onClick={() => deleteBookFromCollection(book.id)}
+                  />
+                </td>
               </tr>
             ))}
           </tbody>
@@ -255,5 +273,15 @@ const Table = styled.table`
   td,
   th {
     padding: 16px 32px;
+  }
+`;
+
+const DeleteButton = styled(DeleteForeverIcon)`
+  :hover {
+    filter: brightness(85%);
+  }
+
+  :active {
+    filter: brightness(70%);
   }
 `;
