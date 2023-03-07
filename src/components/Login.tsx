@@ -1,12 +1,14 @@
-import React from 'react';
 import styled from 'styled-components';
 import GoogleIcon from '@mui/icons-material/Google';
+import { signInWithPopup } from 'firebase/auth';
 
-function Login({ handleLogin }: { handleLogin: any }) {
+import { auth, provider } from '../../firebase-config';
+
+function Login() {
   return (
     <Container>
       <h1>Log in</h1>
-      <LoginBtn onClick={handleLogin}>
+      <LoginBtn onClick={() => signInWithPopup(auth, provider)}>
         <GoogleIcon />
         Log in with Google
       </LoginBtn>

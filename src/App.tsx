@@ -1,9 +1,8 @@
-import React from 'react';
 import styled from 'styled-components';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, provider } from '../firebase-config';
-import { signInWithPopup, signOut } from 'firebase/auth';
+import { signOut } from 'firebase/auth';
 
+import { auth } from '../firebase-config';
 import Login from './components/Login';
 import BookList from './components/BookList';
 
@@ -17,11 +16,7 @@ function App() {
         {user && <LogoutBtn onClick={() => signOut(auth)}>Logout</LogoutBtn>}
       </Header>
 
-      {!user ? (
-        <Login handleLogin={() => signInWithPopup(auth, provider)} />
-      ) : (
-        <BookList />
-      )}
+      {!user ? <Login /> : <BookList />}
     </>
   );
 }
