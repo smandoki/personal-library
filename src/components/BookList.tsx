@@ -5,16 +5,20 @@ import { User } from 'firebase/auth';
 import { db } from '../../firebase-config';
 import { addDoc, collection, getDocs } from 'firebase/firestore';
 
-interface Book {
+interface IFormInput {
   title: string;
   author: string;
   pages: string;
   read: boolean;
 }
 
+interface Book extends IFormInput {
+  id: string;
+}
+
 function BookList({ user }: { user: User }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const { register, handleSubmit, reset } = useForm<Book>();
+  const { register, handleSubmit, reset } = useForm<IFormInput>();
   const [books, setBooks] = useState<Book[]>([]);
 
   const onSubmit = handleSubmit((data) => {
@@ -27,10 +31,13 @@ function BookList({ user }: { user: User }) {
     reset();
   };
 
-  const addBookToCollection = async (data: Book) => {
+  const addBookToCollection = async (data: IFormInput) => {
     try {
-      await addDoc(collection(db, `users/${user.uid}/books`), { ...data });
-      setBooks((prevBooks) => [...prevBooks, { ...data }]);
+      const docRef = await addDoc(collection(db, `users/${user.uid}/books`), {
+        ...data,
+      });
+
+      setBooks((prevBooks) => [...prevBooks, { id: docRef.id, ...data }]);
     } catch (e) {
       console.error('Error adding document: ', e);
     }
@@ -45,7 +52,7 @@ function BookList({ user }: { user: User }) {
 
       const books: Book[] = [];
       querySnapshot.forEach((doc) => {
-        books.push(doc.data() as Book);
+        books.push({ id: doc.id, ...doc.data() } as Book);
       });
 
       setBooks(books);
@@ -93,25 +100,27 @@ function BookList({ user }: { user: User }) {
         </form>
       </AddBookDialog>
 
-      <Table>
-        <tbody>
-          <tr>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Pages</th>
-            <th>Read</th>
-          </tr>
-
-          {books.map((book, index) => (
-            <tr key={index}>
-              <td>{book.title}</td>
-              <td>{book.author}</td>
-              <td>{book.pages}</td>
-              <td>{book.read ? 'read' : 'not read'}</td>
+      {books.length > 0 && (
+        <Table>
+          <tbody>
+            <tr>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Pages</th>
+              <th>Read</th>
             </tr>
-          ))}
-        </tbody>
-      </Table>
+
+            {books.map((book) => (
+              <tr key={book.id}>
+                <td>{book.title}</td>
+                <td>{book.author}</td>
+                <td>{book.pages}</td>
+                <td>{book.read ? 'read' : 'not read'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      )}
     </Container>
   );
 }
@@ -237,6 +246,10 @@ const Table = styled.table`
       border-top: 1px solid darkgray;
       border-bottom: 1px solid darkgray;
     }
+  }
+
+  th {
+    text-align: left;
   }
 
   td,
