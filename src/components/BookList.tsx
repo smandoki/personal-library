@@ -1,6 +1,9 @@
 import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
+import { User } from 'firebase/auth';
+import { db } from '../../firebase-config';
+import { addDoc, collection } from 'firebase/firestore';
 
 interface IFormInput {
   title: string;
@@ -9,18 +12,34 @@ interface IFormInput {
   read: boolean;
 }
 
-function BookList() {
+function BookList({ user }: { user: User }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const { register, handleSubmit, reset } = useForm<IFormInput>();
 
   const onSubmit = handleSubmit((data) => {
-    console.log(data);
     closeDialog();
+    addBookToCollection(data);
   });
 
   const closeDialog = () => {
     dialogRef.current?.close();
     reset();
+  };
+
+  const addBookToCollection = async (data: IFormInput) => {
+    try {
+      const docRef = await addDoc(collection(db, 'books'), {
+        uid: user.uid,
+        title: data.title,
+        author: data.author,
+        pages: data.pages,
+        read: data.read,
+      });
+
+      console.log('Document written with ID: ', docRef.id);
+    } catch (e) {
+      console.error('Error adding document: ', e);
+    }
   };
 
   return (

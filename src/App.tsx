@@ -16,7 +16,7 @@ function App() {
         {user && <LogoutBtn onClick={() => signOut(auth)}>Logout</LogoutBtn>}
       </Header>
 
-      {!user ? <Login /> : <BookList />}
+      {!user ? <Login /> : <BookList user={user} />}
     </>
   );
 }
