@@ -9,6 +9,7 @@ import {
   deleteDoc,
   getDocs,
   doc,
+  updateDoc,
 } from 'firebase/firestore';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
@@ -50,27 +51,41 @@ function BookList({ user }: { user: User }) {
     }
   };
 
+  const getBooksFromCollection = async () => {
+    const querySnapshot = await getDocs(
+      collection(db, `users/${user.uid}/books`)
+    );
+
+    const books: Book[] = [];
+    querySnapshot.forEach((doc) => {
+      books.push({ id: doc.id, ...doc.data() } as Book);
+    });
+
+    setBooks(books);
+  };
+
   //load users books
   useEffect(() => {
-    const getBooksFromCollection = async () => {
-      const querySnapshot = await getDocs(
-        collection(db, `users/${user.uid}/books`)
-      );
-
-      const books: Book[] = [];
-      querySnapshot.forEach((doc) => {
-        books.push({ id: doc.id, ...doc.data() } as Book);
-      });
-
-      setBooks(books);
-    };
-
     getBooksFromCollection();
   }, [user]);
 
   const deleteBookFromCollection = async (id: string) => {
     await deleteDoc(doc(db, `users/${user.uid}/books`, id));
     setBooks((prevBooks) => prevBooks.filter((book) => book.id != id));
+  };
+
+  const toggleReadStatus = async (id: string, read: boolean) => {
+    await updateDoc(doc(db, `users/${user.uid}/books`, id), { read: !read });
+
+    setBooks((prevBooks) =>
+      prevBooks.map((book) => {
+        if (book.id === id) {
+          return { ...book, read: !read };
+        }
+
+        return { ...book };
+      })
+    );
   };
 
   return (
@@ -128,7 +143,13 @@ function BookList({ user }: { user: User }) {
                 <td>{book.title}</td>
                 <td>{book.author}</td>
                 <td>{book.pages}</td>
-                <td>{book.read ? 'read' : 'not read'}</td>
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={book.read}
+                    onChange={() => toggleReadStatus(book.id, book.read)}
+                  />
+                </td>
                 <td>
                   <DeleteButton
                     onClick={() => deleteBookFromCollection(book.id)}
