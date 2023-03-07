@@ -1,8 +1,27 @@
 import { useRef } from 'react';
+import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
+
+interface IFormInput {
+  title: string;
+  author: string;
+  pages: string;
+  read: boolean;
+}
 
 function BookList() {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const { register, handleSubmit, reset } = useForm<IFormInput>();
+
+  const onSubmit = handleSubmit((data) => {
+    console.log(data);
+    closeDialog();
+  });
+
+  const closeDialog = () => {
+    dialogRef.current?.close();
+    reset();
+  };
 
   return (
     <Container>
@@ -10,30 +29,30 @@ function BookList() {
         + Add Book
       </AddBookBtn>
 
-      <AddBookDialog ref={dialogRef} onClick={() => dialogRef.current?.close()}>
-        <form method="dialog" onClick={(e) => e.stopPropagation()}>
+      <AddBookDialog ref={dialogRef} onClick={closeDialog}>
+        <form
+          method="dialog"
+          onClick={(e) => e.stopPropagation()}
+          onSubmit={onSubmit}
+        >
           <h2>Add New Book</h2>
 
           <label htmlFor="title">Title:</label>
-          <input type="text" name="title" required />
+          <input type="text" {...register('title')} required />
 
           <label htmlFor="author">Author:</label>
-          <input type="text" name="author" required />
+          <input type="text" {...register('author')} required />
 
           <label htmlFor="pages">Pages:</label>
-          <input type="number" name="pages" min="1" required />
+          <input type="number" {...register('pages')} min="1" required />
 
           <label className="checkbox-label">
             Have you read this book?
-            <input type="checkbox" name="read" />
+            <input type="checkbox" {...register('read')} />
           </label>
 
           <ButtonContainer>
-            <button
-              type="button"
-              id="cancel-button"
-              onClick={() => dialogRef.current?.close()}
-            >
+            <button type="button" id="cancel-button" onClick={closeDialog}>
               Cancel
             </button>
             <button type="submit" id="submit-button">
