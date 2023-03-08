@@ -41,11 +41,11 @@ function BookList({ user }: { user: User }) {
 
   const addBookToCollection = async (data: IFormInput) => {
     try {
-      const docRef = await addDoc(collection(db, `users/${user.uid}/books`), {
+      await addDoc(collection(db, `users/${user.uid}/books`), {
         ...data,
       });
 
-      setBooks((prevBooks) => [...prevBooks, { id: docRef.id, ...data }]);
+      getBooksFromCollection();
     } catch (e) {
       console.error('Error adding document: ', e);
     }
@@ -71,21 +71,12 @@ function BookList({ user }: { user: User }) {
 
   const deleteBookFromCollection = async (id: string) => {
     await deleteDoc(doc(db, `users/${user.uid}/books`, id));
-    setBooks((prevBooks) => prevBooks.filter((book) => book.id != id));
+    getBooksFromCollection();
   };
 
   const toggleReadStatus = async (id: string, read: boolean) => {
     await updateDoc(doc(db, `users/${user.uid}/books`, id), { read: !read });
-
-    setBooks((prevBooks) =>
-      prevBooks.map((book) => {
-        if (book.id === id) {
-          return { ...book, read: !read };
-        }
-
-        return { ...book };
-      })
-    );
+    getBooksFromCollection();
   };
 
   return (
