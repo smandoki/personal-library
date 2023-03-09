@@ -64,7 +64,7 @@ function BookList({ user }: { user: User }) {
     setBooks(books);
   };
 
-  //load users books
+  //load users books on mount and when new user logs in
   useEffect(() => {
     getBooksFromCollection();
   }, [user]);
@@ -75,6 +75,18 @@ function BookList({ user }: { user: User }) {
   };
 
   const toggleReadStatus = async (id: string, read: boolean) => {
+    //update local state first to make checkbox feel responsive
+    setBooks((prevBooks) =>
+      prevBooks.map((book) => {
+        if (book.id === id) {
+          return { ...book, read: !read };
+        }
+
+        return { ...book };
+      })
+    );
+
+    //then update firestore and refetch state
     await updateDoc(doc(db, `users/${user.uid}/books`, id), { read: !read });
     getBooksFromCollection();
   };
