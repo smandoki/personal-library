@@ -7,9 +7,10 @@ import {
   addDoc,
   collection,
   deleteDoc,
-  getDocs,
   doc,
   updateDoc,
+  query,
+  onSnapshot,
 } from 'firebase/firestore';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
@@ -44,51 +45,31 @@ function BookList({ user }: { user: User }) {
       await addDoc(collection(db, `users/${user.uid}/books`), {
         ...data,
       });
-
-      getBooksFromCollection();
     } catch (e) {
       console.error('Error adding document: ', e);
     }
   };
 
-  const getBooksFromCollection = async () => {
-    const querySnapshot = await getDocs(
-      collection(db, `users/${user.uid}/books`)
-    );
+  useEffect(() => {
+    const q = query(collection(db, `users/${user.uid}/books`));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const books: Book[] = [];
+      querySnapshot.forEach((doc) => {
+        books.push({ id: doc.id, ...doc.data() } as Book);
+      });
 
-    const books: Book[] = [];
-    querySnapshot.forEach((doc) => {
-      books.push({ id: doc.id, ...doc.data() } as Book);
+      setBooks(books);
     });
 
-    setBooks(books);
-  };
-
-  //load users books on mount and when new user logs in
-  useEffect(() => {
-    getBooksFromCollection();
+    return () => unsubscribe();
   }, [user]);
 
   const deleteBookFromCollection = async (id: string) => {
     await deleteDoc(doc(db, `users/${user.uid}/books`, id));
-    getBooksFromCollection();
   };
 
   const toggleReadStatus = async (id: string, read: boolean) => {
-    //update local state first to make checkbox feel responsive
-    setBooks((prevBooks) =>
-      prevBooks.map((book) => {
-        if (book.id === id) {
-          return { ...book, read: !read };
-        }
-
-        return { ...book };
-      })
-    );
-
-    //then update firestore and refetch state
     await updateDoc(doc(db, `users/${user.uid}/books`, id), { read: !read });
-    getBooksFromCollection();
   };
 
   return (
